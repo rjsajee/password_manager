@@ -31,7 +31,21 @@ void UserController::start() {
 
 void UserController::handleRegister() {
     string username = view.promptUsername();
-    string password = view.promptPassword();
+
+    // **Generate a random password and offer it to the user**
+    string randomPassword = model.generateRandomPassword();
+    view.displayMessage("Generated Password: " + randomPassword);
+    view.displayMessage("Do you want to use this generated password? (yes/no)");
+
+    string choice;
+    cin >> choice;
+    string password;
+
+    if (choice == "yes") {
+    }
+    else {
+        password = view.promptPassword();  
+    }
 
     if (model.registerUser(username, password)) {
         view.displayMessage("Registration is successful!");
