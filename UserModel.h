@@ -12,7 +12,7 @@ public:
     string generateRandomPassword(int length = 12);
 
 private:
-    string hashPassword(const std::string& password); 
+    string hashPassword(const string& password); 
 };
 
 

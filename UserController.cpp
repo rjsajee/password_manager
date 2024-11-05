@@ -1,6 +1,6 @@
-// UserController.cpp
 #include "UserController.h"
 #include <iostream>
+
 using namespace std;
 
 UserController::UserController(UserModel& model, UserView& view)
@@ -32,7 +32,6 @@ void UserController::start() {
 void UserController::handleRegister() {
     string username = view.promptUsername();
 
-    // **Generate a random password and offer it to the user**
     string randomPassword = model.generateRandomPassword();
     view.displayMessage("Generated Password: " + randomPassword);
     view.displayMessage("Do you want to use this generated password? (yes/no)");
@@ -42,9 +41,10 @@ void UserController::handleRegister() {
     string password;
 
     if (choice == "yes") {
+        password = randomPassword;
     }
     else {
-        password = view.promptPassword();  
+        password = view.promptPassword();
     }
 
     if (model.registerUser(username, password)) {
@@ -61,6 +61,13 @@ void UserController::handleLogin() {
 
     if (model.loginUser(username, password)) {
         view.displayMessage("Your login is successful! Thanks for logging in.");
+
+        // Instantiate Profile components and start profile management
+        ProfileModel profileModel(username);
+        ProfileView profileView;
+        ProfileController profileController(profileModel, profileView);
+
+        profileController.manageProfile();  // Calls the profile menu after successful login
     }
     else {
         view.displayMessage("Login Error. Please check your username and password.");
