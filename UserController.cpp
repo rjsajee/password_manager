@@ -31,6 +31,7 @@ void UserController::start() {
 
 void UserController::handleRegister() {
     string username = view.promptUsername();
+    string role = view.promptRole();  // Prompt for role
 
     string randomPassword = model.generateRandomPassword();
     view.displayMessage("Generated Password: " + randomPassword);
@@ -47,7 +48,7 @@ void UserController::handleRegister() {
         password = view.promptPassword();
     }
 
-    if (model.registerUser(username, password)) {
+    if (model.registerUser(username, password, role)) {  // Pass role to model
         view.displayMessage("Registration is successful!");
     }
     else {
@@ -60,16 +61,16 @@ void UserController::handleLogin() {
     string password = view.promptPassword();
 
     if (model.loginUser(username, password)) {
-        view.displayMessage("Your login is successful! Thanks for logging in.");
+        string role = model.getUserRole(username);  // Retrieve user role
+        view.displayMessage("Login successful. Role: " + role);
 
-        // Instantiate Profile components and start profile management
         ProfileModel profileModel(username);
         ProfileView profileView;
-        ProfileController profileController(profileModel, profileView);
-
-        profileController.manageProfile();  // Calls the profile menu after successful login
+        ProfileController profileController(profileModel, profileView, role);  // Pass role
+        profileController.manageProfile();
     }
     else {
         view.displayMessage("Login Error. Please check your username and password.");
     }
 }
+

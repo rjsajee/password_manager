@@ -7,7 +7,7 @@
 
 class ProfileView {
 public:
-    void showProfileMenu(const std::string& username);
+    void showProfileMenu(const std::string& username, const std::string& role);  // Updated to include role
     void displayPasswords(const std::vector<PasswordRecord>& passwords);
     PasswordRecord promptPasswordDetails();
     int promptPasswordId();

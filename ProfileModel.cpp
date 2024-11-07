@@ -43,6 +43,16 @@ vector<PasswordRecord> ProfileModel::getAllPasswords() const {
     return passwords;
 }
 
+vector<PasswordRecord> ProfileModel::getUserPasswords() const {
+    vector<PasswordRecord> userPasswords;
+    for (const auto& record : passwords) {
+        if (record.username == username) {
+            userPasswords.push_back(record);
+        }
+    }
+    return userPasswords;
+}
+
 string ProfileModel::getUsername() const {
     return username;
 }

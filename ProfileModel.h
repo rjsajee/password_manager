@@ -25,6 +25,7 @@ public:
     bool editPassword(int id, const PasswordRecord& updatedRecord);
     bool deletePassword(int id);
     std::vector<PasswordRecord> getAllPasswords() const;
+    std::vector<PasswordRecord> getUserPasswords() const;  // New function for user-specific passwords
 
     std::string getUsername() const;
     static std::string getCurrentDate();

@@ -3,14 +3,21 @@
 
 using namespace std;
 
-void ProfileView::showProfileMenu(const string& username) {
+void ProfileView::showProfileMenu(const string& username, const string& role) {
     cout << "\n--- Profile Screen ---" << endl;
     cout << "Welcome, " << username << "!" << endl;
-    cout << "1. View All passwords" << endl;
-    cout << "2. Add Password" << endl;
-    cout << "3. Edit Password" << endl;
-    cout << "4. Delete Password" << endl;
-    cout << "5. Logout" << endl;
+
+    if (role == "admin") {
+        cout << "1. View All Users' Passwords" << endl;
+        cout << "2. Edit Password" << endl;
+        cout << "3. Delete Password" << endl;
+        cout << "4. Logout" << endl;
+    }
+    else {
+        cout << "1. View Your Passwords" << endl;
+        cout << "2. Add Password" << endl;
+        cout << "3. Logout" << endl;
+    }
 }
 
 void ProfileView::displayPasswords(const vector<PasswordRecord>& passwords) {

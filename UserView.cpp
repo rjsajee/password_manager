@@ -1,4 +1,3 @@
-// UserView.cpp
 #include "UserView.h"
 #include <iostream>
 using namespace std;
@@ -27,4 +26,11 @@ string UserView::promptPassword() {
     cout << "PASSWORD: ";
     cin >> password;
     return password;
+}
+
+string UserView::promptRole() {
+    string role;
+    cout << "ROLE (admin/user): ";
+    cin >> role;
+    return role;
 }

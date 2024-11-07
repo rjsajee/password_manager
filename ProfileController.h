@@ -7,12 +7,13 @@
 
 class ProfileController {
 public:
-    ProfileController(ProfileModel& model, ProfileView& view);
+    ProfileController(ProfileModel& model, ProfileView& view, const std::string& role);
     void manageProfile();
 
 private:
     ProfileModel& model;
     ProfileView& view;
+    std::string role;
 
     void viewAllPasswords();
     void addPassword();

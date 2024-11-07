@@ -1,4 +1,3 @@
-// UserView.h
 #ifndef USER_VIEW_H
 #define USER_VIEW_H
 
@@ -11,6 +10,7 @@ public:
     void displayMessage(const string& message);
     string promptUsername();
     string promptPassword();
+    string promptRole();  // New function to prompt role
 };
 
 #endif
