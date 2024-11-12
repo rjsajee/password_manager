@@ -20,21 +20,25 @@ void ProfileView::showProfileMenu(const string& username, const string& role) {
     }
 }
 
-void ProfileView::displayPasswords(const vector<PasswordRecord>& passwords) {
+void ProfileView::displayPasswords(const map<int, PasswordRecord>& passwords) {
     cout << "\n--- Stored Passwords ---" << endl;
-    for (const auto& record : passwords) {
-        cout << "ID: " << record.id << ", Type: ";
-        switch (record.appType) {
-        case AppType::Website: cout << "Website"; break;
-        case AppType::DesktopApplication: cout << "Desktop Application"; break;
-        case AppType::Game: cout << "Game"; break;
-        }
-        cout << ", Username: " << record.username << ", App Name: " << record.appName;
-        if (!record.extraInfo.empty()) {
-            cout << ", Extra Info: " << record.extraInfo;
-        }
-        cout << ", Date Created: " << record.dateCreated << ", Last Updated: " << record.dateLastUpdated << endl;
+    for (const std::pair<const int, PasswordRecord>& pair : passwords) {
+    const int& id = pair.first;
+    const PasswordRecord& record = pair.second;
+
+    cout << "ID: " << id << ", Type: ";
+    switch (record.appType) {
+    case AppType::Website: cout << "Website"; break;
+    case AppType::DesktopApplication: cout << "Desktop Application"; break;
+    case AppType::Game: cout << "Game"; break;
     }
+    cout << ", Username: " << record.username << ", App Name: " << record.appName;
+    if (!record.extraInfo.empty()) {
+        cout << ", Extra Info: " << record.extraInfo;
+    }
+    cout << ", Date Created: " << record.dateCreated << ", Last Updated: " << record.dateLastUpdated << endl;
+}
+
 }
 
 PasswordRecord ProfileView::promptPasswordDetails() {
@@ -42,8 +46,6 @@ PasswordRecord ProfileView::promptPasswordDetails() {
     record.appType = promptAppType();
     cout << "Enter Username: ";
     cin >> record.username;
-    cout << "Enter Password: ";
-    cin >> record.password;
 
     switch (record.appType) {
     case AppType::Website:

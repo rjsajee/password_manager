@@ -9,7 +9,7 @@ ProfileController::ProfileController(ProfileModel& model, ProfileView& view, con
 void ProfileController::manageProfile() {
     int choice;
     do {
-        view.showProfileMenu(model.getUsername(), role); // Pass role to display menu
+        view.showProfileMenu(model.getUsername(), role);
         cout << "Choose an option: ";
         cin >> choice;
 
@@ -22,7 +22,7 @@ void ProfileController::manageProfile() {
             default: view.displayMessage("Invalid choice. Try again.");
             }
         }
-        else { // role == "user"
+        else {
             switch (choice) {
             case 1: viewAllPasswords(); break;
             case 2: addPassword(); break;
@@ -34,13 +34,33 @@ void ProfileController::manageProfile() {
 }
 
 void ProfileController::viewAllPasswords() {
-    vector<PasswordRecord> records = (role == "admin") ? model.getAllPasswords() : model.getUserPasswords();
-    view.displayPasswords(records);
+    auto records = (role == "admin") ? model.getAllPasswords() : model.getUserPasswords();
+    //view.displayPasswords(records);
 }
 
 void ProfileController::addPassword() {
     if (role == "user") {
         PasswordRecord newRecord = view.promptPasswordDetails();
+
+        // Generate and display a random password
+        std::string randomPassword = model.generateRandomPassword();
+        view.displayMessage("Generated Password: " + randomPassword);
+        view.displayMessage("Do you want to use this generated password? (yes/no)");
+
+        std::string choice;
+        std::cin >> choice;
+
+        if (choice == "yes") {
+            newRecord.password = randomPassword;
+        }
+        else {
+            // Prompt the user to manually enter a password
+            view.displayMessage("Please enter your password:");
+            std::cin >> newRecord.password;
+        }
+
+        newRecord.password = model.hashPassword(newRecord.password);  // Hash the password before storing
+
         if (model.addPassword(newRecord)) {
             view.displayMessage("Password added successfully!");
         }
@@ -52,6 +72,7 @@ void ProfileController::addPassword() {
         view.displayMessage("Admins cannot add passwords.");
     }
 }
+
 
 void ProfileController::editPassword() {
     if (role == "admin") {

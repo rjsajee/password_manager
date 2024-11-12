@@ -3,12 +3,12 @@
 
 #include "ProfileModel.h"
 #include <string>
-#include <vector>
+#include <map>
 
 class ProfileView {
 public:
-    void showProfileMenu(const std::string& username, const std::string& role);  // Updated to include role
-    void displayPasswords(const std::vector<PasswordRecord>& passwords);
+    void showProfileMenu(const std::string& username, const std::string& role);
+    void displayPasswords(const std::map<int, PasswordRecord>& passwords);
     PasswordRecord promptPasswordDetails();
     int promptPasswordId();
     void displayMessage(const std::string& message);
