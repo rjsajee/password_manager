@@ -35,12 +35,16 @@ void ProfileController::manageProfile() {
 
 void ProfileController::viewAllPasswords() {
     auto records = (role == "admin") ? model.getAllPasswords() : model.getUserPasswords();
-    //view.displayPasswords(records);
+    view.displayPasswords(records);
 }
 
 void ProfileController::addPassword() {
     if (role == "user") {
         PasswordRecord newRecord = view.promptPasswordDetails();
+
+        // Automatically assign the logged-in user's username
+        newRecord.creatorUsername = model.getUsername();  // Logged-in user's username
+        newRecord.dateCreated = newRecord.dateLastUpdated = ProfileModel::getCurrentDate();
 
         // Generate and display a random password
         std::string randomPassword = model.generateRandomPassword();
@@ -54,12 +58,11 @@ void ProfileController::addPassword() {
             newRecord.password = randomPassword;
         }
         else {
-            // Prompt the user to manually enter a password
             view.displayMessage("Please enter your password:");
             std::cin >> newRecord.password;
         }
 
-        newRecord.password = model.hashPassword(newRecord.password);  // Hash the password before storing
+        newRecord.password = model.hashPassword(newRecord.password);  // Hash the password
 
         if (model.addPassword(newRecord)) {
             view.displayMessage("Password added successfully!");
@@ -72,7 +75,6 @@ void ProfileController::addPassword() {
         view.displayMessage("Admins cannot add passwords.");
     }
 }
-
 
 void ProfileController::editPassword() {
     if (role == "admin") {

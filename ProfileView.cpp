@@ -22,51 +22,57 @@ void ProfileView::showProfileMenu(const string& username, const string& role) {
 
 void ProfileView::displayPasswords(const map<int, PasswordRecord>& passwords) {
     cout << "\n--- Stored Passwords ---" << endl;
-    for (const std::pair<const int, PasswordRecord>& pair : passwords) {
-    const int& id = pair.first;
-    const PasswordRecord& record = pair.second;
+    for (const std::pair<const int, PasswordRecord>& entry : passwords) {
+        const int& id = entry.first;
+        const PasswordRecord& record = entry.second;
 
-    cout << "ID: " << id << ", Type: ";
-    switch (record.appType) {
-    case AppType::Website: cout << "Website"; break;
-    case AppType::DesktopApplication: cout << "Desktop Application"; break;
-    case AppType::Game: cout << "Game"; break;
+        cout << "ID: " << id << ", Type: ";
+        switch (record.appType) {
+        case AppType::Website: cout << "Website"; break;
+        case AppType::DesktopApplication: cout << "Desktop Application"; break;
+        case AppType::Game: cout << "Game"; break;
+        default: cout << "Unknown"; break;
+        }
+
+        cout << ", Creator Username: " << record.creatorUsername
+            << ", App Username: " << record.appUsername
+            << ", App Name: " << record.appName;
+
+        if (!record.extraInfo.empty()) {
+            cout << ", Extra Info: " << record.extraInfo;
+        }
+
+        cout << ", Date Created: " << record.dateCreated
+            << ", Last Updated: " << record.dateLastUpdated << endl;
     }
-    cout << ", Username: " << record.username << ", App Name: " << record.appName;
-    if (!record.extraInfo.empty()) {
-        cout << ", Extra Info: " << record.extraInfo;
-    }
-    cout << ", Date Created: " << record.dateCreated << ", Last Updated: " << record.dateLastUpdated << endl;
 }
 
-}
 
 PasswordRecord ProfileView::promptPasswordDetails() {
     PasswordRecord record;
     record.appType = promptAppType();
-    cout << "Enter Username: ";
-    cin >> record.username;
+
+    // Prompt for app-related username
+    cout << "Enter App Username: ";
+    cin >> record.appUsername;
+
+    cout << "Enter App Name: ";
+    cin >> record.appName;
 
     switch (record.appType) {
     case AppType::Website:
-        cout << "Enter Website Name: ";
-        cin >> record.appName;
         cout << "Enter Website URL: ";
         cin >> record.extraInfo;
         break;
-    case AppType::DesktopApplication:
-        cout << "Enter Application Name: ";
-        cin >> record.appName;
-        break;
     case AppType::Game:
-        cout << "Enter Game Name: ";
-        cin >> record.appName;
         cout << "Enter Game Developer: ";
         cin >> record.extraInfo;
         break;
+    default:
+        record.extraInfo = "";
+        break;
     }
 
-    record.dateCreated = record.dateLastUpdated = ProfileModel::getCurrentDate();
     return record;
 }
 
@@ -85,5 +91,13 @@ AppType ProfileView::promptAppType() {
     cout << "Select App Type:\n1. Website\n2. Desktop Application\n3. Game\n";
     int type;
     cin >> type;
-    return static_cast<AppType>(type - 1);
+
+    switch (type) {
+    case 1: return AppType::Website;
+    case 2: return AppType::DesktopApplication;
+    case 3: return AppType::Game;
+    default:
+        cout << "Invalid type selected, defaulting to Website." << endl;
+        return AppType::Website;
+    }
 }

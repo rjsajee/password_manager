@@ -9,7 +9,8 @@ enum class AppType { Website, DesktopApplication, Game };
 struct PasswordRecord {
     int id;
     AppType appType;
-    std::string username;
+    std::string creatorUsername;  // Logged-in user's username
+    std::string appUsername;      // App account's username
     std::string password;
     std::string appName;
     std::string extraInfo;
@@ -34,14 +35,13 @@ public:
     std::string hashPassword(const std::string& password);
 
 private:
-    std::string username;
+    std::string username;  // Logged-in user's username
     std::map<int, PasswordRecord> passwords;
     int nextId;
 
     void loadPasswords();
     void savePasswords() const;
 
-    // Helper functions for AppType conversion
     static std::string appTypeToString(AppType type);
     static AppType stringToAppType(const std::string& typeStr);
 };

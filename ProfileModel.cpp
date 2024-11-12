@@ -16,7 +16,6 @@ ProfileModel::ProfileModel(const string& username) : username(username), nextId(
 bool ProfileModel::addPassword(const PasswordRecord& record) {
     PasswordRecord newRecord = record;
     newRecord.id = nextId++;
-    newRecord.password = hashPassword(record.password);  // Hash password before storing
     passwords[newRecord.id] = newRecord;
     savePasswords();
     return true;
@@ -25,7 +24,7 @@ bool ProfileModel::addPassword(const PasswordRecord& record) {
 bool ProfileModel::editPassword(int id, const PasswordRecord& updatedRecord) {
     if (passwords.find(id) != passwords.end()) {
         PasswordRecord newRecord = updatedRecord;
-        newRecord.password = hashPassword(updatedRecord.password);  // Hash updated password
+        newRecord.dateLastUpdated = getCurrentDate(); // Update timestamp
         passwords[id] = newRecord;
         savePasswords();
         return true;
@@ -42,18 +41,18 @@ bool ProfileModel::deletePassword(int id) {
 }
 
 map<int, PasswordRecord> ProfileModel::getAllPasswords() const {
-    return passwords;
+    return passwords; // Admin use case: View all passwords
 }
 
 map<int, PasswordRecord> ProfileModel::getUserPasswords() const {
     map<int, PasswordRecord> userPasswords;
-    for (const std::pair<const int, PasswordRecord>& entry : passwords) {
+    for (const auto& entry : passwords) {
         const PasswordRecord& record = entry.second;
-        if (record.username == username) {
+        if (record.creatorUsername == username) {
             userPasswords[entry.first] = record;
         }
     }
-    return userPasswords;
+    return userPasswords; // Regular user use case: View only own passwords
 }
 
 string ProfileModel::getUsername() const {
@@ -73,7 +72,8 @@ void ProfileModel::loadPasswords() {
         PasswordRecord record;
         string appTypeStr;
 
-        if (!(iss >> record.id >> appTypeStr >> record.username >> record.password >> record.appName)) {
+        if (!(iss >> record.id >> appTypeStr >> record.creatorUsername >> record.appUsername
+            >> record.password >> record.appName)) {
             cerr << "Error parsing line: " << line << endl;
             continue;
         }
@@ -98,12 +98,12 @@ void ProfileModel::savePasswords() const {
         return;
     }
 
-    for (const std::pair<const int, PasswordRecord>& entry : passwords) {
+    for (const auto& entry : passwords) {
         const PasswordRecord& record = entry.second;
 
         file << record.id << " " << appTypeToString(record.appType) << " "
-            << record.username << " " << record.password << " "
-            << record.appName << " ";
+            << record.creatorUsername << " " << record.appUsername << " "
+            << record.password << " " << record.appName << " ";
 
         if (record.appType == AppType::Website || record.appType == AppType::Game) {
             file << record.extraInfo << " ";
@@ -184,7 +184,7 @@ string ProfileModel::getCurrentDate() {
     return date.str();
 }
 
-std::string ProfileModel::appTypeToString(AppType type) {
+string ProfileModel::appTypeToString(AppType type) {
     switch (type) {
     case AppType::Website: return "Website";
     case AppType::DesktopApplication: return "DesktopApplication";
@@ -193,7 +193,7 @@ std::string ProfileModel::appTypeToString(AppType type) {
     }
 }
 
-AppType ProfileModel::stringToAppType(const std::string& typeStr) {
+AppType ProfileModel::stringToAppType(const string& typeStr) {
     if (typeStr == "Website") return AppType::Website;
     if (typeStr == "DesktopApplication") return AppType::DesktopApplication;
     if (typeStr == "Game") return AppType::Game;
