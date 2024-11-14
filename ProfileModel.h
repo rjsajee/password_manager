@@ -2,15 +2,15 @@
 #define PROFILE_MODEL_H
 
 #include <string>
-#include <map>
+#include <map>  // std::map and std::multimap
 
 enum class AppType { Website, DesktopApplication, Game };
 
 struct PasswordRecord {
     int id;
     AppType appType;
-    std::string creatorUsername;  // Logged-in user's username
-    std::string appUsername;      // App account's username
+    std::string creatorUsername;
+    std::string appUsername;
     std::string password;
     std::string appName;
     std::string extraInfo;
@@ -27,23 +27,23 @@ public:
     bool deletePassword(int id);
     std::map<int, PasswordRecord> getAllPasswords() const;
     std::map<int, PasswordRecord> getUserPasswords() const;
+    std::multimap<std::string, PasswordRecord> getPasswordsByLastUpdatedDate(const std::string& date) const;
 
     std::string getUsername() const;
     static std::string getCurrentDate();
-
     std::string generateRandomPassword(int length = 12);
     std::string hashPassword(const std::string& password);
 
+    static std::string appTypeToString(AppType type);
+    static AppType stringToAppType(const std::string& typeStr);
+
 private:
-    std::string username;  // Logged-in user's username
+    std::string username;
     std::map<int, PasswordRecord> passwords;
     int nextId;
 
     void loadPasswords();
     void savePasswords() const;
-
-    static std::string appTypeToString(AppType type);
-    static AppType stringToAppType(const std::string& typeStr);
 };
 
 #endif

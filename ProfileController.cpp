@@ -26,43 +26,67 @@ void ProfileController::manageProfile() {
             switch (choice) {
             case 1: viewAllPasswords(); break;
             case 2: addPassword(); break;
-            case 3: view.displayMessage("Logging out..."); break;
+            case 3: searchPasswordByAppName(); break;
+            case 4: view.displayMessage("Logging out..."); break;
             default: view.displayMessage("Invalid choice. Try again.");
             }
         }
-    } while (role == "admin" ? choice != 4 : choice != 3);
+    } while (role == "admin" ? choice != 4 : choice != 4);
 }
 
 void ProfileController::viewAllPasswords() {
-    auto records = (role == "admin") ? model.getAllPasswords() : model.getUserPasswords();
-    view.displayPasswords(records);
+    if (role == "admin") {
+        auto records = model.getAllPasswords();
+        view.displayPasswords(records);
+    }
+    else {
+        view.displayMessage("View your passwords:\n1. Normal view\n2. Filter by Last Updated Date");
+        int sortChoice;
+        cin >> sortChoice;
+
+        if (sortChoice == 2) {
+            view.displayMessage("Enter the Last Updated Date (YYYY-MM-DD):");
+            string enteredDate;
+            cin >> enteredDate;
+
+            auto filteredRecords = model.getPasswordsByLastUpdatedDate(enteredDate);
+            if (filteredRecords.empty()) {
+                view.displayMessage("No passwords found for the entered date.");
+            }
+            else {
+                view.displaySortedPasswords(filteredRecords);
+            }
+        }
+        else {
+            auto records = model.getUserPasswords();
+            view.displayPasswords(records);
+        }
+    }
 }
 
 void ProfileController::addPassword() {
     if (role == "user") {
         PasswordRecord newRecord = view.promptPasswordDetails();
 
-        // Automatically assign the logged-in user's username
-        newRecord.creatorUsername = model.getUsername();  // Logged-in user's username
+        newRecord.creatorUsername = model.getUsername();
         newRecord.dateCreated = newRecord.dateLastUpdated = ProfileModel::getCurrentDate();
 
-        // Generate and display a random password
-        std::string randomPassword = model.generateRandomPassword();
+        string randomPassword = model.generateRandomPassword();
         view.displayMessage("Generated Password: " + randomPassword);
         view.displayMessage("Do you want to use this generated password? (yes/no)");
 
-        std::string choice;
-        std::cin >> choice;
+        string choice;
+        cin >> choice;
 
         if (choice == "yes") {
             newRecord.password = randomPassword;
         }
         else {
             view.displayMessage("Please enter your password:");
-            std::cin >> newRecord.password;
+            cin >> newRecord.password;
         }
 
-        newRecord.password = model.hashPassword(newRecord.password);  // Hash the password
+        newRecord.password = model.hashPassword(newRecord.password);
 
         if (model.addPassword(newRecord)) {
             view.displayMessage("Password added successfully!");
@@ -104,5 +128,34 @@ void ProfileController::deletePassword() {
     }
     else {
         view.displayMessage("Users cannot delete passwords.");
+    }
+}
+
+void ProfileController::searchPasswordByAppName() {
+    if (role == "admin") {
+        view.displayMessage("Admins cannot search passwords.");
+        return;
+    }
+
+    view.displayMessage("Enter the App or Game Name to search:");
+    string searchQuery;
+    cin.ignore();
+    getline(cin, searchQuery);
+
+    map<int, PasswordRecord> userPasswords = model.getUserPasswords();
+    map<int, PasswordRecord> searchResults;
+
+    for (const auto& entry : userPasswords) {
+        const PasswordRecord& record = entry.second;
+        if (record.appName.find(searchQuery) != string::npos) {
+            searchResults[entry.first] = record;
+        }
+    }
+
+    if (searchResults.empty()) {
+        view.displayMessage("No records found matching the search query.");
+    }
+    else {
+        view.displayPasswords(searchResults);
     }
 }

@@ -3,12 +3,13 @@
 
 #include "ProfileModel.h"
 #include <string>
-#include <map>
+#include <map>  // std::map and std::multimap
 
 class ProfileView {
 public:
     void showProfileMenu(const std::string& username, const std::string& role);
     void displayPasswords(const std::map<int, PasswordRecord>& passwords);
+    void displaySortedPasswords(const std::multimap<std::string, PasswordRecord>& passwords);  // Updated
     PasswordRecord promptPasswordDetails();
     int promptPasswordId();
     void displayMessage(const std::string& message);

@@ -22,10 +22,27 @@ bool ProfileModel::addPassword(const PasswordRecord& record) {
 }
 
 bool ProfileModel::editPassword(int id, const PasswordRecord& updatedRecord) {
-    if (passwords.find(id) != passwords.end()) {
+    auto it = passwords.find(id);  // Find the record by ID
+    if (it != passwords.end()) {
+        PasswordRecord& existingRecord = it->second;  // Reference to the existing record
+
+        // Preserve ID, creator username, and date created
         PasswordRecord newRecord = updatedRecord;
-        newRecord.dateLastUpdated = getCurrentDate(); // Update timestamp
-        passwords[id] = newRecord;
+        newRecord.id = existingRecord.id;
+        newRecord.creatorUsername = existingRecord.creatorUsername;
+        newRecord.dateCreated = existingRecord.dateCreated;
+
+        // Prompt for and hash the new app password
+        cout << "Enter new app password: ";
+        string newAppPassword;
+        cin >> newAppPassword;
+
+        newRecord.password = hashPassword(newAppPassword);  // Encrypt the new password
+        newRecord.dateLastUpdated = getCurrentDate();  // Update last updated date
+
+        // Replace the old record
+        existingRecord = newRecord;
+
         savePasswords();
         return true;
     }
@@ -41,7 +58,7 @@ bool ProfileModel::deletePassword(int id) {
 }
 
 map<int, PasswordRecord> ProfileModel::getAllPasswords() const {
-    return passwords; // Admin use case: View all passwords
+    return passwords;  // Admin use case: View all passwords
 }
 
 map<int, PasswordRecord> ProfileModel::getUserPasswords() const {
@@ -52,7 +69,20 @@ map<int, PasswordRecord> ProfileModel::getUserPasswords() const {
             userPasswords[entry.first] = record;
         }
     }
-    return userPasswords; // Regular user use case: View only own passwords
+    return userPasswords;
+}
+
+multimap<string, PasswordRecord> ProfileModel::getPasswordsByLastUpdatedDate(const string& date) const {
+    multimap<string, PasswordRecord> filteredPasswords;
+
+    for (const auto& entry : passwords) {
+        const PasswordRecord& record = entry.second;
+        if (record.creatorUsername == username && record.dateLastUpdated == date) {
+            filteredPasswords.insert({ record.dateLastUpdated, record });
+        }
+    }
+
+    return filteredPasswords;
 }
 
 string ProfileModel::getUsername() const {
@@ -197,5 +227,5 @@ AppType ProfileModel::stringToAppType(const string& typeStr) {
     if (typeStr == "Website") return AppType::Website;
     if (typeStr == "DesktopApplication") return AppType::DesktopApplication;
     if (typeStr == "Game") return AppType::Game;
-    return AppType::Website; // Default to Website if unknown
+    return AppType::Website;  // Default to Website if unknown
 }

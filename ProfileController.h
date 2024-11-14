@@ -19,6 +19,7 @@ private:
     void addPassword();
     void editPassword();
     void deletePassword();
+    void searchPasswordByAppName();
 };
 
 #endif
