@@ -31,7 +31,7 @@ void ProfileController::manageProfile() {
             default: view.displayMessage("Invalid choice. Try again.");
             }
         }
-    } while (role == "admin" ? choice != 4 : choice != 4);
+    } while (choice != 4);
 }
 
 void ProfileController::viewAllPasswords() {
@@ -40,21 +40,21 @@ void ProfileController::viewAllPasswords() {
         view.displayPasswords(records);
     }
     else {
-        view.displayMessage("View your passwords:\n1. Normal view\n2. Filter by Last Updated Date");
+        view.displayMessage("View your passwords:\n1. Normal view\n2. Sort by Last Updated Date");
         int sortChoice;
         cin >> sortChoice;
 
         if (sortChoice == 2) {
-            view.displayMessage("Enter the Last Updated Date (YYYY-MM-DD):");
-            string enteredDate;
-            cin >> enteredDate;
+            view.displayMessage("Choose sorting order:\n1. Ascending (Old to New)\n2. Descending (New to Old)");
+            int orderChoice;
+            cin >> orderChoice;
 
-            auto filteredRecords = model.getPasswordsByLastUpdatedDate(enteredDate);
-            if (filteredRecords.empty()) {
-                view.displayMessage("No passwords found for the entered date.");
+            auto sortedRecords = model.getSortedPasswordsByLastUpdatedDate(orderChoice == 1);
+            if (sortedRecords.empty()) {
+                view.displayMessage("No passwords found.");
             }
             else {
-                view.displaySortedPasswords(filteredRecords);
+                view.displaySortedPasswords(sortedRecords);
             }
         }
         else {
@@ -104,6 +104,7 @@ void ProfileController::editPassword() {
     if (role == "admin") {
         int id = view.promptPasswordId();
         PasswordRecord updatedRecord = view.promptPasswordDetails();
+
         if (model.editPassword(id, updatedRecord)) {
             view.displayMessage("Password updated successfully!");
         }

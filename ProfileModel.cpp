@@ -6,6 +6,8 @@
 #include <openssl/evp.h>
 #include <random>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,25 +24,22 @@ bool ProfileModel::addPassword(const PasswordRecord& record) {
 }
 
 bool ProfileModel::editPassword(int id, const PasswordRecord& updatedRecord) {
-    auto it = passwords.find(id);  // Find the record by ID
+    auto it = passwords.find(id);
     if (it != passwords.end()) {
-        PasswordRecord& existingRecord = it->second;  // Reference to the existing record
+        PasswordRecord& existingRecord = it->second;
 
-        // Preserve ID, creator username, and date created
         PasswordRecord newRecord = updatedRecord;
         newRecord.id = existingRecord.id;
         newRecord.creatorUsername = existingRecord.creatorUsername;
         newRecord.dateCreated = existingRecord.dateCreated;
 
-        // Prompt for and hash the new app password
         cout << "Enter new app password: ";
         string newAppPassword;
         cin >> newAppPassword;
 
-        newRecord.password = hashPassword(newAppPassword);  // Encrypt the new password
-        newRecord.dateLastUpdated = getCurrentDate();  // Update last updated date
+        newRecord.password = hashPassword(newAppPassword);
+        newRecord.dateLastUpdated = getCurrentDate();
 
-        // Replace the old record
         existingRecord = newRecord;
 
         savePasswords();
@@ -58,7 +57,7 @@ bool ProfileModel::deletePassword(int id) {
 }
 
 map<int, PasswordRecord> ProfileModel::getAllPasswords() const {
-    return passwords;  // Admin use case: View all passwords
+    return passwords;
 }
 
 map<int, PasswordRecord> ProfileModel::getUserPasswords() const {
@@ -71,19 +70,40 @@ map<int, PasswordRecord> ProfileModel::getUserPasswords() const {
     }
     return userPasswords;
 }
+std::multimap<std::string, PasswordRecord> ProfileModel::getSortedPasswordsByLastUpdatedDate(bool ascending) const {
+    std::vector<PasswordRecord> sortedPasswords;
 
-multimap<string, PasswordRecord> ProfileModel::getPasswordsByLastUpdatedDate(const string& date) const {
-    multimap<string, PasswordRecord> filteredPasswords;
-
+    // Collect user-specific records
     for (const auto& entry : passwords) {
         const PasswordRecord& record = entry.second;
-        if (record.creatorUsername == username && record.dateLastUpdated == date) {
-            filteredPasswords.insert({ record.dateLastUpdated, record });
+        if (record.creatorUsername == username) {  // Filter only the logged-in user's records
+            sortedPasswords.push_back(record);
         }
     }
 
-    return filteredPasswords;
+    // Sort the vector based on dateLastUpdated
+    std::sort(sortedPasswords.begin(), sortedPasswords.end(), [ascending](const PasswordRecord& a, const PasswordRecord& b) {
+        return ascending ? a.dateLastUpdated < b.dateLastUpdated : a.dateLastUpdated > b.dateLastUpdated;
+        });
+
+    // Debugging: Verify the sorted order
+    std::cout << "\n--- Your Passwords (Sorted by Last Updated Date) ---" << std::endl;
+    for (const auto& record : sortedPasswords) {
+        cout << "ID: " << record.id << ", Type: " << ProfileModel::appTypeToString(record.appType)
+            << ", App Username: " << record.appUsername << ", App Name: " << record.appName
+            << ", Date Created: " << record.dateCreated
+            << ", Last Updated: " << record.dateLastUpdated << endl;
+    }
+
+    // Move sorted vector into multimap to retain sorting
+    std::multimap<std::string, PasswordRecord> sortedResult;
+    for (const auto& record : sortedPasswords) {
+        sortedResult.insert({ record.dateLastUpdated, record });
+    }
+
+    return sortedResult;
 }
+
 
 string ProfileModel::getUsername() const {
     return username;

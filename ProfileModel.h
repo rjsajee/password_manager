@@ -2,7 +2,7 @@
 #define PROFILE_MODEL_H
 
 #include <string>
-#include <map>  // std::map and std::multimap
+#include <map>
 
 enum class AppType { Website, DesktopApplication, Game };
 
@@ -27,7 +27,7 @@ public:
     bool deletePassword(int id);
     std::map<int, PasswordRecord> getAllPasswords() const;
     std::map<int, PasswordRecord> getUserPasswords() const;
-    std::multimap<std::string, PasswordRecord> getPasswordsByLastUpdatedDate(const std::string& date) const;
+    std::multimap<std::string, PasswordRecord> getSortedPasswordsByLastUpdatedDate(bool ascending = true) const;
 
     std::string getUsername() const;
     static std::string getCurrentDate();

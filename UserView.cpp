@@ -1,13 +1,25 @@
 #include "UserView.h"
 #include <iostream>
+#include "Utility.h"
 using namespace std;
 
 void UserView::showMainMenu() {
-    cout << "\t\t\t Welcome to the Password Manager App\n\n";
-    cout << "\t\t| Press 1 to Register           |\n";
-    cout << "\t\t| Press 2 to Login              |\n";
-    cout << "\t\t| Press 3 to Exit               |\n";
-    cout << "Enter your choice: ";
+    enableVirtualTerminalProcessing();
+
+    // Box design for Welcome Screen
+    cout << Color::Cyan;
+    cout << "##############################################" << endl;
+    cout << "#                                            #" << endl;
+    cout << "#   " << Color::Yellow << Color::Bold << "Welcome to the Password Manager!" << Color::Cyan << "   #" << endl;
+    cout << "#                                            #" << endl;
+    cout << "##############################################" << Color::Reset << endl;
+
+    // Display Menu Options
+    cout << Color::Magenta << "\n1. Register" << endl;
+    cout << "2. Login" << endl;
+    cout << "3. Exit" << Color::Reset << endl;
+
+    cout << Color::Green << "\nEnter your choice: " << Color::Reset;
 }
 
 void UserView::displayMessage(const string& message) {

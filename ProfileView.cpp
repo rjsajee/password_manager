@@ -1,76 +1,55 @@
 #include "ProfileView.h"
+#include "Utility.h"
 #include <iostream>
 
 using namespace std;
 
 void ProfileView::showProfileMenu(const string& username, const string& role) {
-    cout << "\n--- Profile Screen ---" << endl;
-    cout << "Welcome, " << username << "!" << endl;
+    cout << Color::Cyan;
+    cout << "##############################################" << endl;
+    cout << "#                                            #" << endl;
+    cout << "#         " << Color::Yellow << "Password Manager: User Dashboard" << Color::Cyan << "         #" << endl;
+    cout << "#                                            #" << endl;
+    cout << "#   " << Color::Green << "Welcome, " << username << " (" << role << ")" << Color::Cyan << "             #" << endl;
+    cout << "#                                            #" << endl;
+    cout << "##############################################" << Color::Reset << endl;
 
+    // Display User Options
     if (role == "admin") {
-        cout << "1. View All Users' Passwords" << endl;
+        cout << Color::Cyan << "1. View All Users' Passwords" << endl;
         cout << "2. Edit Password" << endl;
         cout << "3. Delete Password" << endl;
-        cout << "4. Logout" << endl;
+        cout << "4. Logout" << Color::Reset << endl;
     }
     else {
-        cout << "1. View Your Passwords" << endl;
+        cout << Color::Cyan << "1. View Your Passwords" << endl;
         cout << "2. Add Password" << endl;
         cout << "3. Search by App/Game Name" << endl;
-        cout << "4. Logout" << endl;
+        cout << "4. Logout" << Color::Reset << endl;
     }
+
 }
 
 void ProfileView::displayPasswords(const map<int, PasswordRecord>& passwords) {
     cout << "\n--- Stored Passwords ---" << endl;
     for (const auto& entry : passwords) {
-        const int& id = entry.first;
         const PasswordRecord& record = entry.second;
-
-        cout << "ID: " << id << ", Type: ";
-        switch (record.appType) {
-        case AppType::Website: cout << "Website"; break;
-        case AppType::DesktopApplication: cout << "Desktop Application"; break;
-        case AppType::Game: cout << "Game"; break;
-        default: cout << "Unknown"; break;
-        }
-
-        cout << ", Creator Username: " << record.creatorUsername
-            << ", App Username: " << record.appUsername
-            << ", App Name: " << record.appName;
-
-        if (!record.extraInfo.empty()) {
-            cout << ", Extra Info: " << record.extraInfo;
-        }
-
-        cout << ", Date Created: " << record.dateCreated
+        cout << "ID: " << record.id << ", Type: " << ProfileModel::appTypeToString(record.appType)
+            << ", App Username: " << record.appUsername << ", App Name: " << record.appName
+            << ", Date Created: " << record.dateCreated
             << ", Last Updated: " << record.dateLastUpdated << endl;
     }
 }
 
 void ProfileView::displaySortedPasswords(const multimap<string, PasswordRecord>& passwords) {
-    cout << "\n--- Your Passwords (Filtered by Last Updated Date) ---" << endl;
+   /* cout << "\n--- Your Passwords (Sorted by Last Updated Date) ---" << endl;
     for (const auto& entry : passwords) {
         const PasswordRecord& record = entry.second;
-        cout << "ID: " << record.id << ", Type: ";
-        switch (record.appType) {
-        case AppType::Website: cout << "Website"; break;
-        case AppType::DesktopApplication: cout << "Desktop Application"; break;
-        case AppType::Game: cout << "Game"; break;
-        default: cout << "Unknown"; break;
-        }
-
-        cout << ", Creator Username: " << record.creatorUsername
-            << ", App Username: " << record.appUsername
-            << ", App Name: " << record.appName;
-
-        if (!record.extraInfo.empty()) {
-            cout << ", Extra Info: " << record.extraInfo;
-        }
-
-        cout << ", Date Created: " << record.dateCreated
+        cout << "ID: " << record.id << ", Type: " << ProfileModel::appTypeToString(record.appType)
+            << ", App Username: " << record.appUsername << ", App Name: " << record.appName
+            << ", Date Created: " << record.dateCreated
             << ", Last Updated: " << record.dateLastUpdated << endl;
-    }
+    }*/
 }
 
 PasswordRecord ProfileView::promptPasswordDetails() {
